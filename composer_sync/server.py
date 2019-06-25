@@ -25,6 +25,9 @@ def sync():
         data    = request.json
         logging.info('接收值:')
         logging.info(data)
+        print(type(data))
+        print(data)
+        return "hello1"
         projectName   = data['project']['name']
         gitUrl        = data['project']['http_url']
         # gitUrl        = "http://mygitlab.com:8081/root/composer-sync.git"
