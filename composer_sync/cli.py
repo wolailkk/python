@@ -7,15 +7,20 @@ import json
 import os
 import hashlib
 import zipfile
+import logging
+import datetime
 
 def cli():
+    now = datetime.datetime.now()
+    strtime = now.strftime('%Y%m%d')
+    logging.basicConfig(filename='/tmp/sync_cli'+strtime+'.log', level=logging.DEBUG)
     queueCode = config['queue']
     redisPort = config['redisPort']
     redisHost = config['redisHost']
     re_queue  = redis.Redis(host=redisHost, port=redisPort)
 
     if re_queue.llen(queueCode) <= 0:
-        print('当前队列无消息！')
+        logging.info("当前无消息队列.")
         return False
     else:
         return True
@@ -29,8 +34,7 @@ def doing():
         result = re_queue.rpop(queueCode)
         result = json.loads(result)
     except:
-        print('脏数据忽略'+result)
-
+        logging.error("脏数据忽略.")
     try:
         workPath    = config['workPath']#工作路径
         queueCode   = config['queue']
@@ -45,6 +49,7 @@ def doing():
         projectName    = result['projectName']
         # gitUrl = "http://mygitlab.com:8081/root/composer-sync.git"
 
+        logging.error("脏数据忽略.")
         ProjectWorkPath = workPath + projectName + '/'
         if os.path.exists(ProjectWorkPath):
             gitStatus = os.system("cd " + ProjectWorkPath + " && git pull " + gitUrl)# pull
